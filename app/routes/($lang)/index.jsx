@@ -1,7 +1,7 @@
 import {defer} from '@shopify/remix-oxygen';
 import {Suspense} from 'react';
 import {Await, useLoaderData} from '@remix-run/react';
-import {ProductSwimlane, FeaturedCollections, Hero} from '~/components';
+import {ProductSwimlaneHomepage, FeaturedCollections, Hero} from '~/components';
 import {MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
 import {getHeroPlaceholder} from '~/lib/placeholders';
 import {AnalyticsPageType} from '@shopify/hydrogen';
@@ -41,6 +41,11 @@ export async function loader({params, context}) {
         },
       },
     ),
+    collectionAll: context.storefront.query(HOMEPAGE_ALL_QUERY, {
+      variables: {
+        id: 'gid://shopify/Collection/293147443387'
+      }
+    }),
     secondaryHero: context.storefront.query(COLLECTION_HERO_QUERY, {
       variables: {
         handle: 'backcountry',
@@ -74,6 +79,7 @@ export default function Homepage() {
     tertiaryHero,
     featuredCollections,
     featuredProducts,
+    collectionAll,
   } = useLoaderData();
 
   // TODO: skeletons vs placeholders
@@ -92,14 +98,19 @@ export default function Homepage() {
         <Hero {...primaryHero} height="full" top loading="eager" />
       )}
 
-      {featuredProducts && (
+      {collectionAll && (
         <Suspense>
-          <Await resolve={featuredProducts}>
-            {({products}) => {
-              if (!products?.nodes) return <></>;
+          <Await resolve={collectionAll}>
+            {({ collection }) => {
+              // collection.products.edges.map(product => {
+              //   console.log(product.node)
+              // })
+
+              if (!collection.products.edges) return <></>;
+
               return (
-                <ProductSwimlane
-                  products={products.nodes}
+                <ProductSwimlaneHomepage
+                  products={collection.products.edges}
                   title="Featured Products"
                   count={4}
                 />
@@ -211,6 +222,37 @@ export const HOMEPAGE_FEATURED_PRODUCTS_QUERY = `#graphql
     products(first: 8) {
       nodes {
         ...ProductCard
+      }
+    }
+  }
+`;
+
+// products(first: 8) {
+//   nodes {
+//     ...ProductCard
+//   }
+// }
+
+// Collection: All. gid = gid://shopify/Collection/293147443387
+export const HOMEPAGE_ALL_QUERY = `#graphql
+  ${PRODUCT_CARD_FRAGMENT}
+  query getCollectionById($id: ID!) {
+    collection(id: $id) {
+      id
+      title
+      handle
+      image {
+        altText
+        width
+        height
+        url
+      }
+      products(first: 8) {
+        edges {
+          node {
+            ...ProductCard
+          }
+        }
       }
     }
   }

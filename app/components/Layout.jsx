@@ -11,7 +11,6 @@ import {
   IconMenu,
   IconCaret,
   Section,
-  CountrySelector,
   Cart,
   CartLoading,
   Link,
@@ -33,7 +32,7 @@ export function Layout({children, layout}) {
           </a>
         </div>
         <Header
-          title={layout?.shop.name ?? 'Hydrogen'}
+          title={layout?.shop.name}
           menu={layout?.headerMenu}
         />
         <main role="main" id="mainContent" className="flex-grow">
@@ -352,12 +351,10 @@ function Footer({menu}) {
         bg-primary dark:bg-contrast dark:text-primary text-contrast overflow-hidden`}
     >
       <FooterMenu menu={menu} />
-      <CountrySelector />
       <div
         className={`self-end pt-8 opacity-50 md:col-span-2 lg:col-span-${itemsCount}`}
       >
-        &copy; {new Date().getFullYear()} / Shopify, Inc. Hydrogen is an MIT
-        Licensed Open Source project.
+        &copy; Payt's Place {new Date().getFullYear()}
       </div>
     </Section>
   );
@@ -380,6 +377,8 @@ const FooterLink = ({item}) => {
 };
 
 function FooterMenu({menu}) {
+  // console.log(menu)
+  
   const styles = {
     section: 'grid gap-4',
     nav: 'grid gap-2 pb-6',

@@ -42,6 +42,8 @@ export const meta = () => {
 export default function Collections() {
   const {collections} = useLoaderData();
 
+  console.log(collections)
+
   return (
     <>
       <PageHeader heading="Collections" />
